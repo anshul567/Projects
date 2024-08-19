@@ -1,0 +1,54 @@
+{% extends 'index.html' %}
+
+{% block title %} Product List {% endblock %}
+
+{% block navitems %}
+<li class="nav-item">
+    <a href="{% url 'pform' %}" class="nav-link">
+        Add Product
+    </a>
+</li>
+<li class="nav-item">
+    <a href="{% url 'plist' %}" class="nav-link active">
+        Show Product
+    </a>
+    </li>
+{% endblock %}
+
+{% block content %}
+
+<h1 class="text-center">
+    Products
+</h1>
+<table class="table table-bordered table-striped text-center">
+    <thead class="thead-dark">
+        <tr>
+            <th>Product ID</th>
+            <th>Name</th>
+            <th>SKU</th>
+            <th>Price</th>
+            <th>Quantity</th>
+            <th>Supplier Details</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for p in products %}
+        <tr>
+            <td>{{p.product_id}}</td>
+            <td>{{p.name}}</td>
+            <td>{{p.sku}}</td>
+            <td>{{p.price}}</td>
+            <td>{{p.quantity}}</td>
+            <td>{{p.supplier}}</td>
+            <td>
+                <a href="{% url 'pupdate' p.product_id %}" class="btn btn-warning">Update</a>
+                <a href="{% url 'pdelete' p.product_id %}" class="btn btn-danger">Delete</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}
+
