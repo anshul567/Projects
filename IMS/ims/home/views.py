@@ -1,12 +1,14 @@
 from django.shortcuts import render
 from django.views.generic import *
 from django.urls import reverse_lazy
+from django.http import Http404
 from .forms import ProductForm
 from .models import Product
 from .serializers import ProductSerializers
-from django.http import JsonResponse, HttpResponse
-from django.views.decorators.csrf import csrf_exempt
-from rest_framework.parsers import JSONParser
+# from rest_framework.decorators import api_view
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
 # Create your views here.
 
 
@@ -40,42 +42,81 @@ class ProductDeleteView(DeleteView):
     def get_success_url(self):
         return reverse_lazy('plist')
     
-    
-@csrf_exempt
-def product_list_view(request):
-    if request.method == 'GET':
+
+class APIProductListView(APIView):
+
+    def get(self, request):
         product = Product.objects.all()
         serializer = ProductSerializers(product, many=True)
-        return JsonResponse(serializer.data, safe=False)
-    elif request.method == 'POST':
-        data = JSONParser().parse(request)
-        serializer = ProductSerializers(data=data)
+        return Response(serializer.data) 
+    
+    def post(self, request):
+        serializer = ProductSerializers(data=request.data)
         if serializer.is_valid():
             serializer.save()
-            return JsonResponse(serializer.data, status=201)
-        return JsonResponse(serializer.errors, status=400)
-        
-@csrf_exempt
-def product_detalil_view(request, pk):
-    try:
-        product = Product.objects.get(pk=pk)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+class APIProductDetailView(APIView):
 
-    except product.DoesNotExist:
-        return HttpResponse(status=404)
+    def get_product(self, pk):
+        try:
+             return Product.objects.get(pk=pk)
+        except Product.DoesNotExist:
+            raise Http404
+    
+    def put(self, request, pk):
+        product = self.get_product(pk)
+        serializer = ProductSerializers(product, data=serializer.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    if request.method == 'DELETE':
-        product.delete()
-        return HttpResponse(status=204)
-    elif request.method == 'GET':
+    def get(self, request, pk):
+        product = self.get_product(pk)
         serializer = ProductSerializers(product)
-        return JsonResponse(serializer.data, safe=False)
-    elif request.method == 'PUT':
-        data = JSONParser().parse(request)
-        serializer = ProductSerializers(product, data=data)
-        if serializer.is_valid():
-            serializer.save()
-            return JsonResponse(serializer.data)
-        return JsonResponse(serializer.errors, status=400)
+        return Response(serializer.data)
+
+    def delete(self, request, pk):
+        product = self.get_product(pk)
+        product.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+# @api_view(['GET','POST'])
+# def product_list_view(request):
+#     if request.method == 'GET':
+#         product = Product.objects.all()
+#         serializer = ProductSerializers(product, many=True)
+#         return Response(serializer.data)
+#     elif request.method == 'POST':
+#         serializer = ProductSerializers(data=request.data)
+#         if serializer.is_valid():
+#             serializer.save()
+#             return Response(serializer.data, status=status.HTTP_201_CREATED)
+#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+# @api_view(['PUT','GET','DELETE'])
+# def product_detalil_view(request, pk):
+#     try:
+#         product = Product.objects.get(pk=pk)
+
+#     except product.DoesNotExist:
+#         return Response(status=404)
+
+#     if request.method == 'DELETE':
+#         product.delete()
+#         return Response(status=204)
+#     elif request.method == 'GET':
+#         serializer = ProductSerializers(product)
+#         return Response(serializer.data)
+#     elif request.method == 'PUT':
+#         serializer = ProductSerializers(product, data=request.data)
+#         if serializer.is_valid():
+#             serializer.save()
+#             return Response(serializer.data)
+#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
     
