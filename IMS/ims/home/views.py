@@ -9,6 +9,7 @@ from rest_framework.decorators import api_view
 from rest_framework.views import APIView
 from rest_framework import generics
 from rest_framework.response import Response
+from rest_framework.viewsets import ModelViewSet
 from rest_framework import status
 # Create your views here.
 
@@ -42,15 +43,19 @@ class ProductDeleteView(DeleteView):
     
     def get_success_url(self):
         return reverse_lazy('plist')
-
-
-class APIProductListView(generics.ListCreateAPIView):
+    
+class ProductViewSet(ModelViewSet):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
 
-class APIProductDetailView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Product.objects.all()
-    serializer_class = ProductSerializer
+
+# class APIProductListView(generics.ListCreateAPIView):
+#     queryset = Product.objects.all()
+#     serializer_class = ProductSerializer
+
+# class APIProductDetailView(generics.RetrieveUpdateDestroyAPIView):
+#     queryset = Product.objects.all()
+#     serializer_class = ProductSerializer
 
 
 

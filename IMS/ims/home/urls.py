@@ -16,6 +16,11 @@ Including another URLconf
 """
 from django.urls import path, include
 from .views import *
+from rest_framework.routers import DefaultRouter
+
+
+router = DefaultRouter()
+router.register('products', ProductViewSet, basename='api_products')
 
 urlpatterns = [
     path('', HomeView.as_view(), name='home'),
@@ -23,6 +28,5 @@ urlpatterns = [
     path('plist/', ProductListView.as_view(), name='plist'),
     path('pupdate/<pk>/', ProductUpdateView.as_view(), name='pupdate'),
     path('pdelete/<pk>/', ProductDeleteView.as_view(), name='pdelete'),
-    path('api/plist/', APIProductListView.as_view(), name='api_plist' ),
-    path('api/plist/<pk>/', APIProductDetailView.as_view(), name='api_plist_pk' )
+    path('api/', include(router.urls)),
 ]
