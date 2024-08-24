@@ -23,4 +23,6 @@ urlpatterns = [
     path('plist/', ProductListView.as_view(), name='plist'),
     path('pupdate/<pk>/', ProductUpdateView.as_view(), name='pupdate'),
     path('pdelete/<pk>/', ProductDeleteView.as_view(), name='pdelete'),
+    path('api/plist/', product_list_view, name='api_plist' ),
+    path('api/plist/<pk>/', product_detalil_view, name='api_plist_pk' )
 ]
