@@ -17,6 +17,8 @@ Including another URLconf
 from django.urls import path, include
 from .views import *
 from rest_framework.routers import DefaultRouter
+from rest_framework.authtoken.views import obtain_auth_token
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView, TokenVerifyView
 
 
 router = DefaultRouter()
@@ -29,4 +31,10 @@ urlpatterns = [
     path('pupdate/<pk>/', ProductUpdateView.as_view(), name='pupdate'),
     path('pdelete/<pk>/', ProductDeleteView.as_view(), name='pdelete'),
     path('api/', include(router.urls)),
+    path('auth/', include('rest_framework.urls')),
+    path('gettoken/', TokenObtainPairView.as_view()),
+    path('refreshtoken/', TokenRefreshView.as_view()),
+    path('verifytoken/', TokenVerifyView.as_view()),
+
+
 ]
